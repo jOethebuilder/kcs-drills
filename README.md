@@ -47,7 +47,7 @@ A martial arts drill generator for MSi, Lameco, and Ilustrisimo systems. Randoml
 
 | System | Angles |
 |--------|--------|
-| MSi | 1 – 15 |
+| MSI    | 1 – 15 |
 | Lameco | 1 – 12 |
 | Ilustrisimo | 1 – 12 |
 
