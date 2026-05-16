@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="KCS Drills" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <title>Kinetic Combat System Drill Generator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { background: #0d0d0d; min-height: 100vh; }
+    .app { background: #0d0d0d; min-height: 100vh; padding: 2.5rem 1.25rem 3rem; font-family: 'Courier New', monospace; max-width: 480px; margin: 0 auto; }
+    .step { display: none; }
+    .step.active { display: block; }
+
+    .app-header { display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; }
+    .red-bar { width: 4px; height: 36px; background: #e63c3c; border-radius: 2px; }
+    .header-text {}
+    .app-title { color: #e63c3c; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; }
+    .app-subtitle { color: #333; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
+
+    .page-title { color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; line-height: 1.1; margin-bottom: 2rem; }
+
+    .sys-btn { width: 100%; background: #161616; border: 1px solid #2a2a2a; border-radius: 8px; padding: 20px 18px; margin-bottom: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .sys-btn:active { border-color: #e63c3c; background: #1a1010; }
+    .sys-btn-name { color: #ffffff; font-family: 'Courier New', monospace; font-size: 20px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+    .sys-btn-angles { color: #555; font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 1px; }
+
+    .field-label { color: #888; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+    .field-wrap { margin-bottom: 20px; }
+    input[type="number"], input[type="text"] {
+      width: 100%; background: #161616; border: 1px solid #2a2a2a; color: #ffffff;
+      font-family: 'Courier New', monospace; font-size: 20px; padding: 16px 14px;
+      border-radius: 8px; letter-spacing: 2px;
+    }
+    input::placeholder { color: #333; }
+    input:focus { outline: none; border-color: #e63c3c; }
+
+    .primary-btn { width: 100%; background: #e63c3c; color: #ffffff; border: none; border-radius: 8px; padding: 18px; font-family: 'Courier New', monospace; font-size: 16px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; margin-bottom: 12px; }
+    .primary-btn:active { background: #c02f2f; }
+
+    .ghost-btn { width: 100%; background: transparent; color: #555; border: 1px solid #222; border-radius: 8px; padding: 16px; font-family: 'Courier New', monospace; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; margin-bottom: 12px; }
+    .ghost-btn:active { color: #888; border-color: #444; }
+
+    .mode-btn { width: 100%; background: #161616; border: 1px solid #2a2a2a; border-radius: 8px; padding: 20px 18px; margin-bottom: 14px; cursor: pointer; text-align: left; }
+    .mode-btn:active { border-color: #e63c3c; }
+    .mode-btn-name { color: #ffffff; font-family: 'Courier New', monospace; font-size: 20px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+    .mode-btn-sub { color: #555; font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-top: 5px; }
+
+    .back-btn { background: none; border: none; color: #555; font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; padding: 0; margin-bottom: 1.75rem; }
+    .back-btn:active { color: #999; }
+
+    .context-tag { color: #e63c3c; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 0.5rem; }
+
+    .name-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .name-row input { flex: 1; margin-bottom: 0; font-size: 18px; padding: 14px 12px; }
+    .name-num { color: #e63c3c; font-size: 16px; font-weight: 700; min-width: 22px; font-family: 'Courier New', monospace; }
+
+    .known-card { background: #111; border: 1px solid #222; border-radius: 8px; padding: 0 1rem; margin-bottom: 1.5rem; }
+    .known-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #1e1e1e; }
+    .known-row:last-child { border-bottom: none; }
+    .known-name { color: #ffffff; font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+    .known-angles { color: #e63c3c; font-size: 22px; font-weight: 700; letter-spacing: 4px; }
+
+    .progress-row { display: flex; gap: 10px; margin-bottom: 2rem; align-items: center; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; background: #222; }
+    .dot.done { background: #444; }
+    .dot.current { background: #e63c3c; }
+
+    .secret-card { background: #111; border: 1px solid #2a2a2a; border-radius: 10px; padding: 2rem 1.5rem; margin-bottom: 1.75rem; }
+    .secret-sys { color: #e63c3c; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 1rem; }
+    .secret-name { color: #ffffff; font-size: 36px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; line-height: 1.1; margin-bottom: 0.5rem; }
+    .angles-big { font-size: 64px; font-weight: 700; color: #e63c3c; letter-spacing: 6px; line-height: 1.1; margin-top: 1rem; }
+    .reveal-hint { color: #444; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-top: 1.25rem; }
+
+    .divider { margin: 1.5rem 0; border: none; border-top: 1px solid #1a1a1a; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="step active" id="step-system">
+    <div class="app-header">
+      <div class="red-bar"></div>
+      <div class="header-text">
+        <div class="app-title">KCS Drills</div>
+        <div class="app-subtitle">Kinetic Combat System</div>
+      </div>
+    </div>
+    <div class="page-title">Select system</div>
+    <button class="sys-btn" onclick="selectSystem('MSi', 15)">
+      <span class="sys-btn-name">MSi</span><span class="sys-btn-angles">15 angles</span>
+    </button>
+    <button class="sys-btn" onclick="selectSystem('Lameco', 12)">
+      <span class="sys-btn-name">Lameco</span><span class="sys-btn-angles">12 angles</span>
+    </button>
+    <button class="sys-btn" onclick="selectSystem('Ilustrisimo', 12)">
+      <span class="sys-btn-name">Ilustrisimo</span><span class="sys-btn-angles">12 angles</span>
+    </button>
+  </div>
+
+  <div class="step" id="step-students">
+    <button class="back-btn" onclick="fullReset()">← back</button>
+    <div class="context-tag" id="st-sys-tag"></div>
+    <div class="page-title">Students &amp; attacks</div>
+    <div class="field-wrap">
+      <div class="field-label">Number of students</div>
+      <input type="number" id="student-count" min="1" max="20" value="2" />
+    </div>
+    <div class="field-wrap">
+      <div class="field-label">Attacks per student</div>
+      <input type="number" id="attack-count" min="1" max="10" value="3" />
+    </div>
+    <button class="primary-btn" onclick="goToMode()">Next</button>
+  </div>
+
+  <div class="step" id="step-mode">
+    <button class="back-btn" onclick="goTo('step-students')">← back</button>
+    <div class="context-tag" id="mo-sys-tag"></div>
+    <div class="page-title">Select mode</div>
+    <button class="mode-btn" onclick="selectMode('known')">
+      <div class="mode-btn-name">Known</div>
+      <div class="mode-btn-sub">Everyone sees all assignments</div>
+    </button>
+    <button class="mode-btn" onclick="selectMode('secret')">
+      <div class="mode-btn-name">Secret</div>
+      <div class="mode-btn-sub">Each person sees only theirs</div>
+    </button>
+  </div>
+
+  <div class="step" id="step-names">
+    <button class="back-btn" onclick="goTo('step-mode')">← back</button>
+    <div class="context-tag" id="nm-sys-tag"></div>
+    <div class="page-title">Enter names</div>
+    <div id="name-inputs"></div>
+    <hr class="divider" />
+    <button class="primary-btn" onclick="startSecret()">Start drill</button>
+  </div>
+
+  <div class="step" id="step-known">
+    <div class="context-tag" id="known-sys-tag"></div>
+    <div class="page-title">Assignments</div>
+    <div class="known-card" id="known-list"></div>
+    <button class="primary-btn" onclick="rerunKnown()">New drill</button>
+    <button class="ghost-btn" onclick="fullReset()">← back to start</button>
+  </div>
+
+  <div class="step" id="step-secret">
+    <div class="progress-row" id="progress-dots"></div>
+    <div class="secret-card">
+      <div class="secret-sys" id="secret-sys-tag"></div>
+      <div class="secret-name" id="secret-name"></div>
+      <div id="secret-content"></div>
+    </div>
+    <div id="secret-controls"></div>
+  </div>
+
+</div>
+
+<script>
+  var state = { system:'', maxAngle:0, students:0, attacks:0, mode:'', names:[], assignments:[], currentIdx:0, revealed:false };
+
+  function goTo(id) {
+    document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function fullReset() {
+    state = { system:'', maxAngle:0, students:0, attacks:0, mode:'', names:[], assignments:[], currentIdx:0, revealed:false };
+    document.getElementById('student-count').value = 2;
+    document.getElementById('attack-count').value = 3;
+    goTo('step-system');
+  }
+
+  function selectSystem(name, max) {
+    state.system = name; state.maxAngle = max;
+    document.getElementById('st-sys-tag').textContent = name + ' · ' + max + ' angles';
+    goTo('step-students');
+  }
+
+  function goToMode() {
+    var sc = parseInt(document.getElementById('student-count').value);
+    var ac = parseInt(document.getElementById('attack-count').value);
+    if (isNaN(sc)||sc<1) sc=1;
+    if (isNaN(ac)||ac<1) ac=1;
+    state.students = sc; state.attacks = ac;
+    document.getElementById('mo-sys-tag').textContent = state.system + ' · ' + sc + ' students · ' + ac + ' attacks';
+    goTo('step-mode');
+  }
+
+  function selectMode(mode) {
+    state.mode = mode;
+    if (mode === 'secret') {
+      document.getElementById('nm-sys-tag').textContent = state.system + ' · secret mode';
+      buildNameInputs();
+      goTo('step-names');
+    } else { runKnown(); }
+  }
+
+  function buildNameInputs() {
+    var html = '';
+    for (var i = 0; i < state.students; i++) {
+      var v = state.names[i] || '';
+      html += '<div class="name-row"><span class="name-num">' + (i+1) + '</span><input type="text" placeholder="Student ' + (i+1) + '" id="name-' + i + '" value="' + v + '" /></div>';
+    }
+    document.getElementById('name-inputs').innerHTML = html;
+  }
+
+  function randomAngles(count, max) {
+    var pool = []; for (var i = 1; i <= max; i++) pool.push(i);
+    var result = [];
+    for (var j = 0; j < count; j++) {
+      var idx = Math.floor(Math.random() * pool.length);
+      result.push(pool[idx]); pool.splice(idx, 1);
+      if (pool.length === 0) { for (var k = 1; k <= max; k++) pool.push(k); }
+    }
+    return result;
+  }
+
+  function buildAssignments(names) {
+    return names.map(function(n){ return { name: n, angles: randomAngles(state.attacks, state.maxAngle) }; });
+  }
+
+  function runKnown() {
+    var names = [];
+    for (var i = 0; i < state.students; i++) names.push('Student ' + (i+1));
+    state.names = names;
+    state.assignments = buildAssignments(names);
+    renderKnown(); goTo('step-known');
+  }
+
+  function rerunKnown() { state.assignments = buildAssignments(state.names); renderKnown(); }
+
+  function renderKnown() {
+    document.getElementById('known-sys-tag').textContent = state.system + ' · known · ' + state.attacks + ' attacks';
+    var html = '';
+    state.assignments.forEach(function(a){
+      html += '<div class="known-row"><span class="known-name">' + a.name + '</span><span class="known-angles">' + a.angles.join(' · ') + '</span></div>';
+    });
+    document.getElementById('known-list').innerHTML = html;
+  }
+
+  function startSecret() {
+    var names = [];
+    for (var i = 0; i < state.students; i++) {
+      var v = document.getElementById('name-' + i).value.trim();
+      names.push(v || 'Student ' + (i+1));
+    }
+    state.names = names;
+    state.assignments = buildAssignments(names);
+    state.currentIdx = 0; state.revealed = false;
+    renderSecretCard(); goTo('step-secret');
+  }
+
+  function rerunSecret() {
+    state.assignments = buildAssignments(state.names);
+    state.currentIdx = 0; state.revealed = false;
+    renderSecretCard();
+  }
+
+  function renderSecretCard() {
+    var total = state.assignments.length;
+    var idx = state.currentIdx;
+    var dots = '';
+    for (var i = 0; i < total; i++) {
+      var cls = i < idx ? 'done' : (i === idx ? 'current' : '');
+      dots += '<div class="dot ' + cls + '"></div>';
+    }
+    document.getElementById('progress-dots').innerHTML = dots;
+    document.getElementById('secret-sys-tag').textContent = state.system + ' · secret mode';
+    document.getElementById('secret-name').textContent = state.assignments[idx].name;
+
+    if (!state.revealed) {
+      document.getElementById('secret-content').innerHTML = '<div class="reveal-hint">— tap reveal when ready —</div>';
+      document.getElementById('secret-controls').innerHTML =
+        '<button class="primary-btn" onclick="revealAngles()">Reveal</button>' +
+        '<button class="ghost-btn" onclick="fullReset()">← back to start</button>';
+    } else {
+      document.getElementById('secret-content').innerHTML = '<div class="angles-big">' + state.assignments[idx].angles.join(' · ') + '</div>';
+      var ctrl = idx < total - 1
+        ? '<button class="primary-btn" onclick="nextStudent()">Next student</button>'
+        : '<button class="primary-btn" onclick="rerunSecret()">New drill</button>';
+      ctrl += '<button class="ghost-btn" onclick="fullReset()">← back to start</button>';
+      document.getElementById('secret-controls').innerHTML = ctrl;
+    }
+  }
+
+  function revealAngles() { state.revealed = true; renderSecretCard(); }
+  function nextStudent() { state.currentIdx++; state.revealed = false; renderSecretCard(); }
+</script>
+</body>
+</html>
