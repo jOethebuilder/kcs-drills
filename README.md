@@ -17,7 +17,7 @@ A martial arts drill generator for MSi, Lameco, and Ilustrisimo systems.  Use Vi
 1. Open **Chrome**
 2. Go to **https://kcs-drills.netlify.app**
 3. Tap the **three dots** in the top right corner
-4. Tap **Install app**
+4. Tap **Install app or add to home screen**
 5. Tap **Install**
 6. Find **KCS Drills** in your app drawer
 
