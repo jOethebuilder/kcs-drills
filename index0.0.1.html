@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="apple-mobile-web-app-title" content="KCS Drills"/>
+<meta name="theme-color" content="#0d0d0d"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon.png"/>
+<title>Kinetic Combat System Drill Generator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:#0d0d0d;min-height:100vh;}
+.app{background:#0d0d0d;min-height:100vh;padding:2.5rem 1.25rem 3rem;font-family:'Courier New',monospace;max-width:480px;margin:0 auto;}
+.step{display:none;}.step.active{display:block;}
+.app-header{display:flex;align-items:center;gap:10px;margin-bottom:2rem;}
+.red-bar{width:4px;height:36px;background:#e63c3c;border-radius:2px;}
+.app-title{color:#e63c3c;font-size:11px;letter-spacing:3px;text-transform:uppercase;}
+.app-subtitle{color:#aaa;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
+.page-title{color:#fff;font-size:26px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:1.5rem;}
+.ctx{color:#e63c3c;font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;}
+.btn{width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:8px;padding:18px;margin-bottom:12px;cursor:pointer;text-align:left;}
+.btn:active{border-color:#e63c3c;}
+.btn-name{color:#fff;font-family:'Courier New',monospace;font-size:19px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.btn-sub{color:#999;font-family:'Courier New',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+.btn-fl{display:flex;justify-content:space-between;align-items:center;}
+.btn-primary{width:100%;background:#e63c3c;color:#fff;border:none;border-radius:8px;padding:18px;font-family:'Courier New',monospace;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;margin-bottom:12px;}
+.btn-primary:active{background:#c02f2f;}
+.btn-ghost{width:100%;background:transparent;color:#aaa;border:1px solid #444;border-radius:8px;padding:16px;font-family:'Courier New',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-bottom:12px;}
+.btn-ghost:active{color:#fff;border-color:#888;}
+.back{background:none;border:none;color:#aaa;font-family:'Courier New',monospace;font-size:13px;letter-spacing:2px;cursor:pointer;padding:0;margin-bottom:1.5rem;text-transform:uppercase;}
+.back:active{color:#fff;}
+input{width:100%;background:#161616;border:1px solid #2a2a2a;color:#fff;font-family:'Courier New',monospace;font-size:20px;padding:14px;border-radius:8px;margin-bottom:14px;letter-spacing:2px;}
+input::placeholder{color:#333;}
+input:focus{outline:none;border-color:#e63c3c;}
+.lbl{color:#888;font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;}
+.name-row{display:flex;gap:10px;align-items:center;margin-bottom:10px;}
+.name-row input{flex:1;margin-bottom:0;font-size:17px;padding:13px;}
+.nn{color:#e63c3c;font-size:15px;font-weight:700;min-width:20px;}
+.kcard{background:#111;border:1px solid #222;border-radius:8px;padding:0 1rem;margin-bottom:1.5rem;}
+.krow{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #1e1e1e;}
+.krow:last-child{border-bottom:none;}
+.kname{color:#fff;font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.kangles{color:#e63c3c;font-size:20px;font-weight:700;letter-spacing:4px;}
+.dots{display:flex;gap:10px;margin-bottom:2rem;}
+.dot{width:12px;height:12px;border-radius:50%;background:#222;}
+.dot.done{background:#444;}.dot.current{background:#e63c3c;}
+.scard{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:2rem 1.5rem;margin-bottom:1.5rem;}
+.ssys{color:#e63c3c;font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:1rem;}
+.sname{color:#fff;font-size:34px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;}
+.abig{font-size:62px;font-weight:700;color:#e63c3c;letter-spacing:6px;margin-top:1rem;}
+.hint{color:#666;font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-top:1.25rem;}
+.hr{margin:1.5rem 0;border:none;border-top:1px solid #1a1a1a;}
+.drill-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;}
+.dnum{font-size:38vw;font-weight:700;color:#e63c3c;line-height:1;font-family:'Courier New',monospace;}
+.dnum-burst{font-size:20vw;font-weight:700;color:#e63c3c;line-height:1;font-family:'Courier New',monospace;letter-spacing:4vw;}
+.dtag{color:#888;font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:1.5rem;}
+.dprog{color:#888;font-size:12px;letter-spacing:2px;margin-top:1.5rem;}
+.dob-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:55vh;text-align:center;width:100%;}
+.dob-atk-label{color:#888;font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:0.5rem;}
+.dob-atk{font-size:16vw;font-weight:700;color:#e63c3c;line-height:1;font-family:'Courier New',monospace;letter-spacing:2vw;}
+.dob-extra{margin-top:1.5rem;text-align:center;width:100%;}
+.dob-def-label{color:#888;font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;}
+.dob-def-val{color:#f5a623;font-size:20px;font-weight:700;letter-spacing:2px;font-family:'Courier New',monospace;}
+.dob-ctr-label{color:#888;font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;margin-top:1.25rem;}
+.dob-ctr-val{color:#4caf50;font-size:26px;font-weight:700;letter-spacing:4px;font-family:'Courier New',monospace;}
+.c-rh{color:#e63c3c;}
+.c-lh{color:#3b82f6;}
+.c-special{color:#a855f7;}
+.c-defend{color:#f5a623;}
+.c-counter{color:#4caf50;}
+.rot-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;}
+.rot-letter{color:#e63c3c;font-size:13px;letter-spacing:3px;text-transform:uppercase;margin-bottom:0.5rem;}
+.rot-side{color:#888;font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:0.75rem;}
+.rot-strike{font-size:20vw;font-weight:700;line-height:1;font-family:'Courier New',monospace;}
+.rot-prog{color:#888;font-size:12px;letter-spacing:2px;margin-top:1.5rem;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="step active" id="s-system">
+  <div class="app-header"><div class="red-bar"></div><div><div class="app-title">KCS Drills</div><div class="app-subtitle">Kinetic Combat System</div></div></div>
+  <div class="page-title">Select system</div>
+  <button class="btn" onclick="pickSystem('MSi',15)"><div class="btn-fl"><span class="btn-name">MSi</span><span style="color:#999;font-size:12px;">15 angles</span></div></button>
+  <button class="btn" onclick="pickSystem('Lameco',12)"><div class="btn-fl"><span class="btn-name">Lameco</span><span style="color:#999;font-size:12px;">12 angles</span></div></button>
+  <button class="btn" onclick="pickSystem('Ilustrisimo',12)"><div class="btn-fl"><span class="btn-name">Ilustrisimo</span><span style="color:#999;font-size:12px;">12 angles</span></div></button>
+</div>
+
+<div class="step" id="s-drills">
+  <button class="back" onclick="fullReset()">← back</button>
+  <div class="ctx" id="d-ctx"></div>
+  <div class="page-title">Select drill</div>
+  <button class="btn" onclick="pickDrill('random')"><div class="btn-name">Random attack</div><div class="btn-sub">Assign random angles to students</div></button>
+  <div id="extra-drills"></div>
+</div>
+
+<div class="step" id="s-students">
+  <button class="back" onclick="goTo('s-drills')">← back</button>
+  <div class="ctx" id="st-ctx"></div>
+  <div class="page-title">Students &amp; attacks</div>
+  <div class="lbl">Number of students</div>
+  <input type="number" id="sc" min="1" max="20" value="2"/>
+  <div class="lbl">Attacks per student</div>
+  <input type="number" id="ac" min="1" max="10" value="3"/>
+  <button class="btn-primary" onclick="goMode()">Next</button>
+</div>
+
+<div class="step" id="s-mode">
+  <button class="back" onclick="goTo('s-students')">← back</button>
+  <div class="ctx" id="mo-ctx"></div>
+  <div class="page-title">Select mode</div>
+  <button class="btn" onclick="pickMode('known')"><div class="btn-name">Known</div><div class="btn-sub">Everyone sees all assignments</div></button>
+  <button class="btn" onclick="pickMode('secret')"><div class="btn-name">Secret</div><div class="btn-sub">Each person sees only theirs</div></button>
+</div>
+
+<div class="step" id="s-names">
+  <button class="back" onclick="goTo('s-mode')">← back</button>
+  <div class="ctx" id="nm-ctx"></div>
+  <div class="page-title">Enter names</div>
+  <div id="name-inputs"></div>
+  <hr class="hr"/>
+  <button class="btn-primary" onclick="startSecret()">Start drill</button>
+</div>
+
+<div class="step" id="s-known">
+  <div class="ctx" id="kn-ctx"></div>
+  <div class="page-title">Assignments</div>
+  <div class="kcard" id="kn-list"></div>
+  <button class="btn-primary" onclick="rerunKnown()">New drill</button>
+  <button class="btn-ghost" onclick="fullReset()">← back to start</button>
+</div>
+
+<div class="step" id="s-secret">
+  <div class="dots" id="s-dots"></div>
+  <div class="scard"><div class="ssys" id="ss-sys"></div><div class="sname" id="ss-name"></div><div id="ss-content"></div></div>
+  <div id="ss-ctrl"></div>
+</div>
+
+<div class="step" id="s-msi15-range">
+  <button class="back" onclick="goTo('s-drills')">← back</button>
+  <div class="ctx">MSi 15</div>
+  <div class="page-title">Select range</div>
+  <button class="btn" onclick="pickRange('single')"><div class="btn-name">Single</div><div class="btn-sub">1 random angle · 1–15</div></button>
+  <button class="btn" onclick="pickRange('half')"><div class="btn-name">Half</div><div class="btn-sub">8 angles · front or back</div></button>
+  <button class="btn" onclick="pickRange('full')"><div class="btn-name">Full</div><div class="btn-sub">15 angles · 1–15</div></button>
+</div>
+
+<div class="step" id="s-msi15-half">
+  <button class="back" onclick="goTo('s-msi15-range')">← back</button>
+  <div class="ctx">MSi 15 · Half</div>
+  <div class="page-title">Front or back?</div>
+  <button class="btn" onclick="pickHalf('front')"><div class="btn-name">Front</div><div class="btn-sub">Angles 1–7</div></button>
+  <button class="btn" onclick="pickHalf('back')"><div class="btn-name">Back</div><div class="btn-sub">Angles 8–15</div></button>
+</div>
+
+<div class="step" id="s-msi15-speed">
+  <button class="back" id="spd-back">← back</button>
+  <div class="ctx" id="spd-ctx"></div>
+  <div class="page-title">Select speed</div>
+  <button class="btn" onclick="launchMsi15('slow')"><div class="btn-name">Slow</div><div class="btn-sub">1.5 – 3 sec · beginners</div></button>
+  <button class="btn" onclick="launchMsi15('medium')"><div class="btn-name">Medium</div><div class="btn-sub">0.8 – 1.8 sec · intermediate</div></button>
+  <button class="btn" onclick="launchMsi15('fast')"><div class="btn-name">Fast</div><div class="btn-sub">Quick singles and bursts · advanced</div></button>
+</div>
+
+<div class="step" id="s-msi15-drill">
+  <div class="dtag" id="d-tag"></div>
+  <div class="drill-screen">
+    <div id="d-num" class="dnum">—</div>
+    <div class="dprog" id="d-prog"></div>
+  </div>
+  <div id="d-ctrl" style="margin-top:2rem;"></div>
+</div>
+
+<div class="step" id="s-dob-display">
+  <button class="back" onclick="goTo('s-drills')">← back</button>
+  <div class="ctx">Dobletes · MSi</div>
+  <div class="page-title">Select display</div>
+  <button class="btn" onclick="pickDobDisplay('attack')"><div class="btn-name">Attack only</div><div class="btn-sub">Show strike combo only</div></button>
+  <button class="btn" onclick="pickDobDisplay('defend')"><div class="btn-name">Attack + Defend</div><div class="btn-sub">Show combo and defense</div></button>
+  <button class="btn" onclick="pickDobDisplay('counter')"><div class="btn-name">Attack + Counter</div><div class="btn-sub">Show combo and counter</div></button>
+  <button class="btn" onclick="pickDobDisplay('full')"><div class="btn-name">Full</div><div class="btn-sub">Attack, defend, and counter</div></button>
+</div>
+
+<div class="step" id="s-dob-speed">
+  <button class="back" onclick="goTo('s-dob-display')">← back</button>
+  <div class="ctx">Dobletes · MSi</div>
+  <div class="page-title">Select speed</div>
+  <button class="btn" onclick="launchDobletes('slow')"><div class="btn-name">Slow</div><div class="btn-sub">2–3 sec · beginners</div></button>
+  <button class="btn" onclick="launchDobletes('medium')"><div class="btn-name">Medium</div><div class="btn-sub">1–2 sec · intermediate</div></button>
+  <button class="btn" onclick="launchDobletes('fast')"><div class="btn-name">Fast</div><div class="btn-sub">0.5–1 sec · advanced</div></button>
+</div>
+
+<div class="step" id="s-dob-drill">
+  <div class="ctx" id="dob-ctx"></div>
+  <div class="dtag" id="dob-tag"></div>
+  <div class="dob-screen">
+    <div class="dob-atk-label">Strike combo</div>
+    <div id="dob-atk" class="dob-atk"></div>
+    <div id="dob-extra" class="dob-extra" style="display:none;"></div>
+  </div>
+  <div class="dprog" id="dob-prog"></div>
+  <div id="dob-ctrl" style="margin-top:1.5rem;"></div>
+</div>
+
+<div class="step" id="s-rot-letter">
+  <button class="back" onclick="goTo('s-drills')">← back</button>
+  <div class="ctx">Rotunda · MSi</div>
+  <div class="page-title">Select letter</div>
+  <button class="btn" onclick="pickRotLetter('A')"><div class="btn-name">A</div><div class="btn-sub">3 strikes each side</div></button>
+  <button class="btn" onclick="pickRotLetter('B')"><div class="btn-name">B</div><div class="btn-sub">4 strikes each side</div></button>
+  <button class="btn" onclick="pickRotLetter('C')"><div class="btn-name">C</div><div class="btn-sub">6 strikes each side · includes Abanico</div></button>
+  <button class="btn" onclick="pickRotLetter('D')"><div class="btn-name">D</div><div class="btn-sub">4 strikes each side · includes thrust</div></button>
+  <button class="btn" onclick="pickRotLetter('E')"><div class="btn-name">E</div><div class="btn-sub">6 strikes each side · thrust and Abanico</div></button>
+</div>
+
+<div class="step" id="s-rot-speed">
+  <button class="back" onclick="goTo('s-rot-letter')">← back</button>
+  <div class="ctx" id="rot-spd-ctx"></div>
+  <div class="page-title">Select speed</div>
+  <button class="btn" onclick="launchRotunda('slow')"><div class="btn-name">Slow</div><div class="btn-sub">1.5 – 3 sec · beginners</div></button>
+  <button class="btn" onclick="launchRotunda('medium')"><div class="btn-name">Medium</div><div class="btn-sub">0.8 – 1.5 sec · intermediate</div></button>
+  <button class="btn" onclick="launchRotunda('fast')"><div class="btn-name">Fast</div><div class="btn-sub">0.3 – 0.8 sec · advanced</div></button>
+</div>
+
+<div class="step" id="s-rot-drill">
+  <div class="rot-screen">
+    <div class="rot-letter" id="rot-letter-tag"></div>
+    <div class="rot-side" id="rot-side-tag"></div>
+    <div class="rot-strike" id="rot-strike"></div>
+    <div class="rot-prog" id="rot-prog"></div>
+  </div>
+  <div id="rot-ctrl" style="margin-top:2rem;"></div>
+</div>
+
+</div>
+<script>
+var DOBLETES=[
+  {a:'1 → 11',d:'#1 & #10',c:'#6'},
+  {a:'2 → 4',d:'#2 & #4',c:'#6'},
+  {a:'3 → 1',d:'#3 & #1',c:'#7'},
+  {a:'4 → 10',d:'#4 & #11',c:'#7'},
+  {a:'5 → 14',d:'#14 & #4',c:'#6'},
+  {a:'6 → 1',d:'Mid Hanger / Roof & #1',c:'#7',sp:'Mid Hanger / Roof'},
+  {a:'7 → 4',d:'Mid Hanger / Pluma & #4',c:'#6',sp:'Mid Hanger / Pluma'},
+  {a:'8 → 1',d:'#1 & #1',c:'#7'},
+  {a:'9 → 4',d:'#4 & #4',c:'#6'},
+
+  {a:'10 → 4',d:'#11 & #4',c:'#6'},
+  {a:'11 → 1',d:'#10 & #1',c:'#7'},
+  {a:'12 → 1',d:'#1 & #1/#10',c:'#7'},
+  {a:'13 → 4',d:'#4 & #4/#11',c:'#6'},
+  {a:'14 → 1',d:'Roof & #1/#10',c:'#7',sp:'Roof'},
+  {a:'15 → 4',d:'Pluma & #4/#11',c:'#6',sp:'Pluma'}
+];
+
+var ROTUNDA={
+  A:{
+    right:[{h:'RH',s:'#1'},{h:'LH',s:'#1'},{h:'RH',s:'#1'}],
+    left:[{h:'LH',s:'#4'},{h:'RH',s:'#4'},{h:'LH',s:'#4'}]
+  },
+  B:{
+    right:[{h:'RH',s:'#1'},{h:'RH',s:'#1'},{h:'LH',s:'#1'},{h:'RH',s:'#1'}],
+    left:[{h:'LH',s:'#4'},{h:'LH',s:'#4'},{h:'RH',s:'#4'},{h:'LH',s:'#4'}]
+  },
+  C:{
+    right:[{h:'RH',s:'#1'},{h:'RH',s:'#1'},{h:'RH',s:'Abanico',special:true},{h:'RH',s:'#1'},{h:'LH',s:'#1'},{h:'RH',s:'#1'}],
+    left:[{h:'LH',s:'#4'},{h:'LH',s:'#4'},{h:'LH',s:'Abanico',special:true},{h:'LH',s:'#4'},{h:'RH',s:'#4'},{h:'LH',s:'#4'}]
+  },
+  D:{
+    right:[{h:'RH',s:'Thrust #8',special:true},{h:'RH',s:'#1'},{h:'LH',s:'#1'},{h:'RH',s:'#1'}],
+    left:[{h:'LH',s:'Thrust #9',special:true},{h:'LH',s:'#4'},{h:'RH',s:'#4'},{h:'LH',s:'#4'}]
+  },
+  E:{
+    right:[{h:'RH',s:'Thrust #8',special:true},{h:'RH',s:'#1'},{h:'RH',s:'Abanico',special:true},{h:'RH',s:'#1'},{h:'LH',s:'#1'},{h:'RH',s:'#1'}],
+    left:[{h:'LH',s:'Thrust #9',special:true},{h:'LH',s:'#4'},{h:'LH',s:'Abanico',special:true},{h:'LH',s:'#4'},{h:'RH',s:'#4'},{h:'LH',s:'#4'}]
+  }
+};
+
+var S={sys:'',max:0,students:0,attacks:0,mode:'',names:[],asgn:[],idx:0,revealed:false,range:'',half:'',speed:'',dobDisplay:'',rotLetter:'',timer:null};
+
+function goTo(id){
+  document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function fullReset(){
+  if(S.timer) clearTimeout(S.timer);
+  S={sys:'',max:0,students:0,attacks:0,mode:'',names:[],asgn:[],idx:0,revealed:false,range:'',half:'',speed:'',dobDisplay:'',rotLetter:'',timer:null};
+  document.getElementById('sc').value=2;
+  document.getElementById('ac').value=3;
+  goTo('s-system');
+}
+
+function pickSystem(name,max){
+  S.sys=name; S.max=max;
+  document.getElementById('d-ctx').textContent=name+' · '+max+' angles';
+  var ex=document.getElementById('extra-drills');
+  if(name==='MSi'){
+    ex.innerHTML=
+      '<button class="btn" onclick="pickDrill(\'msi15\')"><div class="btn-name">MSi 15</div><div class="btn-sub">Timed single / half / full drill</div></button>'+
+      '<button class="btn" onclick="pickDrill(\'dobletes\')"><div class="btn-name">Dobletes</div><div class="btn-sub">15 strike combinations with defense and counter</div></button>'+
+      '<button class="btn" onclick="pickDrill(\'rotunda\')"><div class="btn-name">Rotunda</div><div class="btn-sub">Double stick patterns A through E</div></button>';
+  } else {
+    ex.innerHTML='';
+  }
+  goTo('s-drills');
+}
+
+function pickDrill(drill){
+  if(drill==='random'){document.getElementById('st-ctx').textContent=S.sys+' · random attack';goTo('s-students');}
+  else if(drill==='msi15') goTo('s-msi15-range');
+  else if(drill==='dobletes') goTo('s-dob-display');
+  else if(drill==='rotunda') goTo('s-rot-letter');
+}
+
+function pickRange(r){
+  S.range=r;
+  if(r==='half'){goTo('s-msi15-half');return;}
+  document.getElementById('spd-ctx').textContent='MSi 15 · '+r.charAt(0).toUpperCase()+r.slice(1);
+  document.getElementById('spd-back').onclick=function(){goTo('s-msi15-range');};
+  goTo('s-msi15-speed');
+}
+
+function pickHalf(h){
+  S.half=h;
+  document.getElementById('spd-ctx').textContent='MSi 15 · Half · '+h.charAt(0).toUpperCase()+h.slice(1);
+  document.getElementById('spd-back').onclick=function(){goTo('s-msi15-half');};
+  goTo('s-msi15-speed');
+}
+
+function buildSeq(){
+  var count,min,max;
+  if(S.range==='single'){count=1;min=1;max=15;}
+  else if(S.range==='half'){count=8;min=S.half==='front'?1:8;max=S.half==='front'?7:15;}
+  else{count=15;min=1;max=15;}
+  var seq=[];
+  for(var i=0;i<count;i++) seq.push(Math.floor(Math.random()*(max-min+1))+min);
+  return seq;
+}
+
+function launchMsi15(speed){
+  S.speed=speed;
+  var seq=buildSeq();
+  var tag='MSi 15 · '+S.range+(S.range==='half'?' · '+S.half:'')+' · '+speed;
+  document.getElementById('d-tag').textContent=tag;
+  document.getElementById('d-ctrl').innerHTML='';
+  goTo('s-msi15-drill');
+  runSeq(seq,speed,0);
+}
+
+function getDelay(speed){
+  if(speed==='slow') return 1500+Math.random()*1500;
+  if(speed==='medium') return 800+Math.random()*1000;
+  return 300+Math.random()*600;
+}
+
+function runSeq(seq,speed,i){
+  var numEl=document.getElementById('d-num');
+  var progEl=document.getElementById('d-prog');
+  if(i>=seq.length){
+    numEl.className='dnum';
+    numEl.style.fontSize='15vw';
+    numEl.style.color='#555';
+    numEl.textContent='DONE';
+    progEl.textContent='';
+    document.getElementById('d-ctrl').innerHTML=
+      '<button class="btn-primary" onclick="launchMsi15(\''+speed+'\')">Run again</button>'+
+      '<button class="btn-ghost" onclick="goTo(\'s-msi15-range\')">Change range</button>'+
+      '<button class="btn-ghost" onclick="fullReset()">← back to start</button>';
+    return;
+  }
+  if(speed==='fast'&&Math.random()<0.3&&i+1<seq.length){
+    var bsize=Math.min(2+Math.floor(Math.random()*2),seq.length-i);
+    numEl.className='dnum-burst';
+    numEl.style.fontSize='';
+    numEl.style.color='';
+    numEl.textContent=seq.slice(i,i+bsize).join('  ');
+    progEl.textContent=(i+bsize)+' / '+seq.length;
+    S.timer=setTimeout(function(){runSeq(seq,speed,i+bsize);},500+Math.random()*500);
+  } else {
+    numEl.className='dnum';
+    numEl.style.fontSize='38vw';
+    numEl.style.color='#e63c3c';
+    numEl.textContent=seq[i];
+    progEl.textContent=(i+1)+' / '+seq.length;
+    S.timer=setTimeout(function(){runSeq(seq,speed,i+1);},getDelay(speed));
+  }
+}
+
+function pickDobDisplay(display){
+  S.dobDisplay=display;
+  goTo('s-dob-speed');
+}
+
+function shuffle(arr){
+  var a=arr.slice();
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+  return a;
+}
+
+function atkDelay(s){
+  if(s==='slow') return 2000+Math.random()*1000;
+  if(s==='medium') return 1000+Math.random()*1000;
+  return 500+Math.random()*500;
+}
+
+function defDelay(s){
+  if(s==='slow') return 2500+Math.random()*1000;
+  if(s==='medium') return 1500+Math.random()*500;
+  return 800+Math.random()*400;
+}
+
+function launchDobletes(speed){
+  S.speed=speed;
+  S.asgn=shuffle(DOBLETES);
+  S.idx=0;
+  document.getElementById('dob-ctx').textContent='Dobletes · MSi · '+S.dobDisplay+' · '+speed;
+  document.getElementById('dob-ctrl').innerHTML='';
+  goTo('s-dob-drill');
+  showDobAttack();
+}
+
+function styleSeps(str, sp){
+  var sep='<span style="color:#555;font-weight:400;margin:0 4px;">';
+  if(sp){
+    var parts=str.split(sp);
+    var spHtml='<span style="color:#a855f7;font-weight:700;">'+sp+'</span>';
+    str=parts.map(function(p){
+      return p.replace(/(&|\/|→)/g,sep+'$1</span>');
+    }).join(spHtml);
+  } else {
+    str=str.replace(/(&|\/|→)/g,sep+'$1</span>');
+  }
+  return str;
+}
+
+function showDobAttack(){
+  var d=S.asgn[S.idx];
+  document.getElementById('dob-tag').textContent='Attack';
+  document.getElementById('dob-atk').innerHTML=styleSeps(d.a);
+  document.getElementById('dob-extra').style.display='none';
+  document.getElementById('dob-prog').textContent=(S.idx+1)+' / '+S.asgn.length;
+  document.getElementById('dob-ctrl').innerHTML='';
+  S.timer=setTimeout(showDobExtra,atkDelay(S.speed));
+}
+
+function showDobExtra(){
+  var d=S.asgn[S.idx];
+  var display=S.dobDisplay;
+  var html='';
+  if(display!=='attack'){
+    document.getElementById('dob-tag').textContent='Defend & Counter';
+    if(display==='defend'||display==='full'){
+      html+='<div class="dob-def-label">Defend</div><div class="dob-def-val">'+styleSeps(d.d,d.sp)+'</div>';
+    }
+    if(display==='counter'||display==='full'){
+      html+='<div class="dob-ctr-label">Counter</div><div class="dob-ctr-val">'+styleSeps(d.c)+'</div>';
+    }
+    document.getElementById('dob-extra').innerHTML=html;
+    document.getElementById('dob-extra').style.display='block';
+  }
+  var last=S.idx>=S.asgn.length-1;
+  S.timer=setTimeout(function(){
+    if(last){
+      document.getElementById('dob-ctrl').innerHTML=
+        '<button class="btn-primary" onclick="launchDobletes(\''+S.speed+'\')">Run again</button>'+
+        '<button class="btn-ghost" onclick="goTo(\'s-dob-display\')">Change display</button>'+
+        '<button class="btn-ghost" onclick="fullReset()">← back to start</button>';
+    } else {
+      S.idx++;
+      showDobAttack();
+    }
+  },display==='attack'?getDelay(S.speed):defDelay(S.speed));
+}
+
+function pickRotLetter(letter){
+  S.rotLetter=letter;
+  document.getElementById('rot-spd-ctx').textContent='Rotunda · '+letter;
+  goTo('s-rot-speed');
+}
+
+function rotDelay(speed){
+  if(speed==='slow') return 1500+Math.random()*1500;
+  if(speed==='medium') return 800+Math.random()*700;
+  return 300+Math.random()*500;
+}
+
+function launchRotunda(speed){
+  S.speed=speed;
+  var data=ROTUNDA[S.rotLetter];
+  var seq=[];
+  data.right.forEach(function(s){seq.push({side:'Right',strike:s});});
+  data.left.forEach(function(s){seq.push({side:'Left',strike:s});});
+  document.getElementById('rot-ctrl').innerHTML='';
+  goTo('s-rot-drill');
+  runRotSeq(seq,speed,0);
+}
+
+function runRotSeq(seq,speed,i){
+  if(i>=seq.length){
+    document.getElementById('rot-letter-tag').textContent='Rotunda '+S.rotLetter+' · '+speed;
+    document.getElementById('rot-side-tag').textContent='';
+    document.getElementById('rot-strike').innerHTML='<span style="font-size:12vw;color:#555;">DONE</span>';
+    document.getElementById('rot-prog').textContent='';
+    document.getElementById('rot-ctrl').innerHTML=
+      '<button class="btn-primary" onclick="launchRotunda(\''+speed+'\')">Run again</button>'+
+      '<button class="btn-ghost" onclick="goTo(\'s-rot-letter\')">Change letter</button>'+
+      '<button class="btn-ghost" onclick="fullReset()">← back to start</button>';
+    return;
+  }
+  var item=seq[i];
+  var strike=item.strike;
+  var color=strike.special?'#a855f7':(item.side==='Right'?'#e63c3c':'#3b82f6');
+  document.getElementById('rot-letter-tag').textContent='Rotunda '+S.rotLetter+' · '+speed;
+  document.getElementById('rot-side-tag').textContent=item.side+' side · '+(i+1)+' / '+seq.length;
+  document.getElementById('rot-strike').innerHTML='<span style="color:'+color+';">'+strike.h+' '+strike.s+'</span>';
+  document.getElementById('rot-prog').textContent='';
+  S.timer=setTimeout(function(){runRotSeq(seq,speed,i+1);},rotDelay(speed));
+}
+
+function goMode(){
+  var sc=parseInt(document.getElementById('sc').value)||2;
+  var ac=parseInt(document.getElementById('ac').value)||3;
+  if(sc<1)sc=1;if(ac<1)ac=1;
+  S.students=sc;S.attacks=ac;
+  document.getElementById('mo-ctx').textContent=S.sys+' · '+sc+' students · '+ac+' attacks';
+  goTo('s-mode');
+}
+
+function pickMode(mode){
+  S.mode=mode;
+  if(mode==='secret'){document.getElementById('nm-ctx').textContent=S.sys+' · secret mode';buildNames();goTo('s-names');}
+  else runKnown();
+}
+
+function buildNames(){
+  var h='';
+  for(var i=0;i<S.students;i++) h+='<div class="name-row"><span class="nn">'+(i+1)+'</span><input type="text" placeholder="Student '+(i+1)+'" id="n'+i+'" value="'+(S.names[i]||'')+'" /></div>';
+  document.getElementById('name-inputs').innerHTML=h;
+}
+
+function rndAngles(count,max){
+  var pool=[],result=[];
+  for(var i=1;i<=max;i++) pool.push(i);
+  for(var j=0;j<count;j++){
+    var idx=Math.floor(Math.random()*pool.length);
+    result.push(pool[idx]);pool.splice(idx,1);
+    if(!pool.length){for(var k=1;k<=max;k++) pool.push(k);}
+  }
+  return result;
+}
+
+function buildAsgn(names){return names.map(function(n){return{name:n,angles:rndAngles(S.attacks,S.max)};});}
+
+function runKnown(){
+  var names=[];
+  for(var i=0;i<S.students;i++) names.push('Student '+(i+1));
+  S.names=names;S.asgn=buildAsgn(names);
+  renderKnown();goTo('s-known');
+}
+
+function rerunKnown(){S.asgn=buildAsgn(S.names);renderKnown();}
+
+function renderKnown(){
+  document.getElementById('kn-ctx').textContent=S.sys+' · known · '+S.attacks+' attacks';
+  var h='';
+  S.asgn.forEach(function(a){h+='<div class="krow"><span class="kname">'+a.name+'</span><span class="kangles">'+a.angles.join(' · ')+'</span></div>';});
+  document.getElementById('kn-list').innerHTML=h;
+}
+
+function startSecret(){
+  var names=[];
+  for(var i=0;i<S.students;i++){var v=document.getElementById('n'+i).value.trim();names.push(v||'Student '+(i+1));}
+  S.names=names;S.asgn=buildAsgn(names);S.idx=0;S.revealed=false;
+  renderSecret();goTo('s-secret');
+}
+
+function rerunSecret(){S.asgn=buildAsgn(S.names);S.idx=0;S.revealed=false;renderSecret();}
+
+function renderSecret(){
+  var total=S.asgn.length,i=S.idx;
+  var dots='';
+  for(var j=0;j<total;j++) dots+='<div class="dot '+(j<i?'done':j===i?'current':'')+'"></div>';
+  document.getElementById('s-dots').innerHTML=dots;
+  document.getElementById('ss-sys').textContent=S.sys+' · secret mode';
+  document.getElementById('ss-name').textContent=S.asgn[i].name;
+  if(!S.revealed){
+    document.getElementById('ss-content').innerHTML='<div class="hint">— tap reveal when ready —</div>';
+    document.getElementById('ss-ctrl').innerHTML='<button class="btn-primary" onclick="doReveal()">Reveal</button><button class="btn-ghost" onclick="fullReset()">← back to start</button>';
+  } else {
+    document.getElementById('ss-content').innerHTML='<div class="abig">'+S.asgn[i].angles.join(' · ')+'</div>';
+    var c=i<total-1?'<button class="btn-primary" onclick="nextStu()">Next student</button>':'<button class="btn-primary" onclick="rerunSecret()">New drill</button>';
+    document.getElementById('ss-ctrl').innerHTML=c+'<button class="btn-ghost" onclick="fullReset()">← back to start</button>';
+  }
+}
+
+function doReveal(){S.revealed=true;renderSecret();}
+function nextStu(){S.idx++;S.revealed=false;renderSecret();}
+</script>
+</body>
+</html>
