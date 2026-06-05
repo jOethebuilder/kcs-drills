@@ -1,7 +1,7 @@
 # KCS Drills
 ### Kinetic Combat System Drill Generator
 
-A martial arts drill generator for MSi, Lameco, and Ilustrisimo systems. Randomly assigns attack angles to students for training drills.
+A martial arts drill generator for MSi, Lameco, and Ilustrisimo systems.  Use Visual-Spatial learning to help student memorize and mastere the drill used in these sytem relying on images, colors, diagrams, and text layouts rather than just plain spoken words.  This is your digital instructor.
 
 ---
 
