@@ -273,7 +273,15 @@ Additional review and clarification needed before implementation.
 Likely to use the same Beginner / Intermediate / Advanced structure developed for Rotunda.
 
 ---
+# Four Conner A
 
+Currently under development.
+
+Additional review and clarification needed before implementation.
+
+Likely to use the same Beginner / Intermediate / Advanced structure developed 
+
+---
 # Design Philosophy
 
 The app should behave like an instructor.
@@ -289,4 +297,4 @@ The goal is not simply displaying information.
 The goal is developing skill through structured training.
 
 ## Update Log
-- May 31, 2026: Add project design notes and full system structure documentation.
+- June,4, 2026: Add project design notes and full system structure documentation.
